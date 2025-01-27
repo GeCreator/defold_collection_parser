@@ -3,6 +3,9 @@
 -- This library is free software; you can redistribute it and/or modify it
 -- under the terms of the MIT license. See LICENSE for details.
 
+-- order protect from shuffle result when save file
+local ORDER = { 'id', 'data', 'name', 'scale_along_z', 'embedded_instances' }
+
 local M = {}
 
 local IGNORE_KEYS = {
@@ -14,6 +17,11 @@ local IGNORE_KEYS = {
 	collectionRootObj = true,
 	dependencyData = true,
 }
+
+local _order = {}
+for k, v in ipairs(ORDER) do
+	_order[v] = k
+end
 
 local INDENT = "  "
 
@@ -275,7 +283,13 @@ end
 local function makeCleanLinesForTable(t, lines, indent, parentKey)
 	local i = 0
 	local doUnIndent = true
-	for k, v in pairs(t) do
+	--- collect keys and sort them --
+	local sorted_keys = {}
+	for k in pairs(t) do table.insert(sorted_keys, k) end
+	table.sort(sorted_keys, function(a, b) return (_order[a] or 0) < (_order[b] or 0) end)
+	---------------------------------
+	for _, k in ipairs(sorted_keys) do
+		local v = t[k]
 		if not IGNORE_KEYS[k] then
 			i = i + 1
 
