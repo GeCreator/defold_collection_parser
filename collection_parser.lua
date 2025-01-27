@@ -78,8 +78,6 @@ local function reIndent(str, x)
 end
 
 local function formatNumber(x)
-	x = string.format("%f", x)
-	x = string.match(x, "(%-?%d+%.0?[0-9]-)[0]*$") -- Cut off extra zeroes.
 	return x
 end
 
