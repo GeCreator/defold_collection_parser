@@ -286,7 +286,7 @@ local function makeCleanLinesForTable(t, lines, indent, parentKey)
 	--- collect keys and sort them --
 	local sorted_keys = {}
 	for k in pairs(t) do table.insert(sorted_keys, k) end
-	table.sort(sorted_keys, function(a, b) return (_order[a] or 0) < (_order[b] or 0) end)
+	table.sort(sorted_keys, function(a, b) return (_order[a] or a) < (_order[b] or b) end)
 	---------------------------------
 	for _, k in ipairs(sorted_keys) do
 		local v = t[k]
