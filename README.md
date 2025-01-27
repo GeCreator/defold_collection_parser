@@ -7,7 +7,7 @@ __parser.decodeFile(file)__
 
 ```lua
 file = io.open(path, "r")
-local data = parser.decodeFile(file, filepath)
+local data = parser.decodeFile(file)
 file:close()
 ```
 

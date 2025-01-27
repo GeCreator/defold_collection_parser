@@ -11,7 +11,6 @@ local IGNORE_KEYS = {
 	files = true,
 	GOID = true,
 	compURLs = true,
-	basePath = true,
 	collectionRootObj = true,
 	dependencyData = true,
 }
@@ -162,7 +161,7 @@ function M.dirtyLine(line, data)
 		data.indent = data.indent + 1
 	end
 
-	if line == [[  "  \"\n"]] then line = [[  "\"\n"]] end  -- The best special case hack ever.
+	if line == [[  "  \"\n"]] then line = [[  "\"\n"]] end -- The best special case hack ever.
 
 	if key ~= "data" then line = line .. "\n" end
 
@@ -322,7 +321,7 @@ function M.tableToCleanLines(data)
 	return lines
 end
 
-function M.decodeFile(file, path)
+function M.decodeFile(file)
 	local cleaningData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {} }
 	-- print("Collection-Parser: Parsing File... " .. tostring(path))
 	for line in file:lines() do
@@ -330,9 +329,6 @@ function M.decodeFile(file, path)
 	end
 
 	local data = M.cleanLinesToTable(cleaningData.lines)
-
-	local basePath = string.match(path, "^(.*)\\main\\.*$")
-	data.basePath = basePath
 
 	-- print("\tDone.")
 	return data
