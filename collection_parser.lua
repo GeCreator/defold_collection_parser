@@ -1,4 +1,3 @@
-
 --		Copyright (c) 2019 Ross Grams
 
 -- This library is free software; you can redistribute it and/or modify it
@@ -86,7 +85,7 @@ local function splitLineIntoParts(line)
 end
 
 local function lineIsData(line)
-	if not line then  return false  end
+	if not line then return false end
 	line = unIndent(line)
 	line = unQuote(line)
 	line = unIndent(line)
@@ -136,7 +135,7 @@ function M.dirtyLine(line, data)
 	local prevLineIsData = lineIsData(data.lines[#data.lines])
 
 	if data.dataLevel > 0 then
-		if key ~= "data" then  line = reNewline(line)  end
+		if key ~= "data" then line = reNewline(line) end
 		if not prevLineIsData and data.dataLevel < 2 then
 			line = reIndent(line, data.indent - 2)
 		end
@@ -148,7 +147,7 @@ function M.dirtyLine(line, data)
 			line = [[\]] .. line
 		end
 	else
-		if not prevLineIsData then  line = reIndent(line, data.indent)  end
+		if not prevLineIsData then line = reIndent(line, data.indent) end
 	end
 
 	if key == "data" then
@@ -163,9 +162,9 @@ function M.dirtyLine(line, data)
 		data.indent = data.indent + 1
 	end
 
-	if line == [[  "  \"\n"]] then  line = [[  "\"\n"]]  end -- The best special case hack ever.
+	if line == [[  "  \"\n"]] then line = [[  "\"\n"]] end  -- The best special case hack ever.
 
-	if key ~= "data" then  line = line .. "\n"  end
+	if key ~= "data" then line = line .. "\n" end
 
 	table.insert(data.lines, line)
 end
@@ -195,7 +194,7 @@ function M.cleanLine(line, data)
 			M.cleanLine(value, data)
 		end
 	elseif separator == ":" then -- Simple key:value pair.
-		if not tonumber(value) then  value = unQuote(value)  end
+		if not tonumber(value) then value = unQuote(value) end
 		line = string.format("%s%s %s", key, separator, value)
 		table.insert(data.lines, reIndent(line, data.indent))
 	elseif separator == "}" then
@@ -210,7 +209,7 @@ end
 
 local function formatVectors(data)
 	if type(data) == "table" then
-		for k,v in pairs(data) do
+		for k, v in pairs(data) do
 			if k == "position" or k == "scale3" then
 				data[k] = vmath.vector3(v.x, v.y, v.z)
 			elseif k == "rotation" then
@@ -227,13 +226,13 @@ function M.cleanLinesToTable(lines)
 	local parents = {}
 	local t = data -- Dynamic ref to the current table.
 
-	for i,line in ipairs(lines) do
+	for i, line in ipairs(lines) do
 		line = unIndent(line)
 		local key, separator, value = splitLineIntoParts(line)
 
 		if separator == "}" then -- Close table.
 			t = parents[t]
-		else -- Key-Value.
+		else                   -- Key-Value.
 			if separator == "{" then
 				value = {}
 			elseif separator == ":" then
@@ -241,7 +240,7 @@ function M.cleanLinesToTable(lines)
 				value = tonumber(value) or value
 			end
 			-- Deal with duplicate keys.
-			if t[key] then -- Key is a duplicate.
+			if t[key] then             -- Key is a duplicate.
 				if type(t[key]) == "table" and t[key][1] then
 					table.insert(t[key], value) -- It's already a list, insert the new value.
 				else
@@ -268,7 +267,7 @@ local function isVecOrQuat(a)
 	end
 end
 
-local function hasW(a)  return a.w  end
+local function hasW(a) return a.w end
 
 local function isQuat(a)
 	return pcall(hasW, a)
@@ -277,11 +276,11 @@ end
 local function makeCleanLinesForTable(t, lines, indent, parentKey)
 	local i = 0
 	local doUnIndent = true
-	for k,v in pairs(t) do
+	for k, v in pairs(t) do
 		if not IGNORE_KEYS[k] then
 			i = i + 1
 
-			if tonumber(k) then  k = parentKey  end
+			if tonumber(k) then k = parentKey end
 
 			if type(v) == "table" then
 				if v[1] then
@@ -295,10 +294,10 @@ local function makeCleanLinesForTable(t, lines, indent, parentKey)
 			elseif isVecOrQuat(v) then
 				table.insert(lines, reIndent(string.format("%s {", k), indent))
 				local t = { x = v.x, y = v.y, z = v.z }
-				if isQuat(v) then  t.w = v.w  end
+				if isQuat(v) then t.w = v.w end
 				makeCleanLinesForTable(t, lines, indent + 1, k)
 			else -- v == a normal value.
-				if k == parentKey then  doUnIndent = false  end
+				if k == parentKey then doUnIndent = false end
 				if tonumber(v) and k ~= "scale_along_z" then
 					v = formatNumber(v)
 				end
@@ -324,7 +323,7 @@ function M.tableToCleanLines(data)
 end
 
 function M.decodeFile(file, path)
-	local cleaningData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {}}
+	local cleaningData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {} }
 	-- print("Collection-Parser: Parsing File... " .. tostring(path))
 	for line in file:lines() do
 		M.cleanLine(line, cleaningData)
@@ -344,13 +343,13 @@ function M.encodeFile(file, data)
 	local lines = M.tableToCleanLines(data)
 
 	-- Dirty the clean lines.
-	local dirtyingData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {}}
-	for i,line in ipairs(lines) do
+	local dirtyingData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {} }
+	for i, line in ipairs(lines) do
 		M.dirtyLine(line, dirtyingData)
 	end
 
 	-- Write to file.
-	for i,line in ipairs(dirtyingData.lines) do
+	for i, line in ipairs(dirtyingData.lines) do
 		file:write(line)
 	end
 end
