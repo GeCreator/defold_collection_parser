@@ -335,12 +335,14 @@ function M.tableToCleanLines(data)
 	return lines
 end
 
-function M.decodeFile(file)
+function M.load(path)
+	local file = io.open(path, "r")
 	local cleaningData = { dataLevel = 0, indent = 0, lines = {}, dataIndentLevels = {} }
 	-- print("Collection-Parser: Parsing File... " .. tostring(path))
 	for line in file:lines() do
 		M.cleanLine(line, cleaningData)
 	end
+	file:close()
 
 	local data = M.cleanLinesToTable(cleaningData.lines)
 
@@ -348,7 +350,8 @@ function M.decodeFile(file)
 	return data
 end
 
-function M.encodeFile(file, data)
+function M.save(path, data)
+	local file = io.open(path, "w")
 	-- Convert data table to clean lines.
 	local lines = M.tableToCleanLines(data)
 
@@ -362,6 +365,7 @@ function M.encodeFile(file, data)
 	for i, line in ipairs(dirtyingData.lines) do
 		file:write(line)
 	end
+	file:close()
 end
 
 return M

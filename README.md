@@ -3,20 +3,15 @@ Should be able to open pretty much any file Defold uses for collections, game ob
 
 ### Minimal usage examples:
 
-__parser.decodeFile(file)__
+__parser.load(filename)__
 
 ```lua
-file = io.open(path, "r")
-local data = parser.decodeFile(file)
-file:close()
+local data = parser.load(filename)
 ```
 
-
-__parser.encodeFile(file, data)__
+__parser.save(filename, data)__
 
 ```lua
-local file = io.open(path, "w")
-parser.encodeFile(file, data)
-file:close()
+parser.encodeFile(filename, data)
 ```
 
