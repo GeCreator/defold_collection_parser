@@ -12,6 +12,7 @@ local data = parser.load(filename)
 __parser.save(filename, data)__
 
 ```lua
-parser.encodeFile(filename, data)
+parser.save(filename, data)
 ```
+
 
